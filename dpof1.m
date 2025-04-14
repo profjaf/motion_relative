@@ -10,16 +10,90 @@ clear
 %   filename='D:/data/point1_new2_cropped.avi';  
 %   filename='D:/data/point2_2_cropped.avi';  
 %   filename='D:/data/point3_cropped.avi';
-filename='D:/data/forced2.mp4';
+% filename='D:/data/forced2.mp4';
+filename='D:/data/cant/cant4.MP4'
+% filename='D:/data/husam/FDfan-left.avi'
   outDir = 'D:/data/Results/';
   video_file = filename;
         
   vr = VideoReader(video_file);
   samplingRate = 500;% vr.FrameRate; %or set it manually
-  frameRange = [500 1600];
+  frameRange = [1 750];
   nF=frameRange(2)-frameRange(1)+1;  
-  mmPerPixel = 0.124;
+  mmPerPixel = 0.357;
   scale_factor  = 1;
+  LocID=4;
+  if(LocID == 1)
+    pt = [544 1346; %y ,x coordinates 259, 560 filename='D:/data/husam/FDfan-left.avi';
+     544 1344;
+     544 1345;
+     544 1347;
+     544 1348;
+     544 1349;     
+     ];
+  end
+  if(LocID == 2)
+    pt = [
+     546 908; %y ,x coordinates 259, 560 filename='D:/data/husam/FDfan-left.avi';
+     546 909;
+     546 910;
+     546 911;
+     546 912;
+     546 913;    
+     ];
+  end
+  if(LocID == 3)
+    pt = [
+     548 457; %y ,x coordinates 259, 560 filename='D:/data/husam/FDfan-left.avi';
+     548 458;
+     548 459;
+     548 460;
+     548 461;
+     548 462;    
+     ];
+  end
+   if(LocID == 4)
+    pt = [
+     549 60; %y ,x coordinates 259, 560 filename='D:/data/husam/FDfan-left.avi';
+     549 61;
+     549 62;
+     549 63;
+     549 64;
+     549 65;    
+     ];
+  end
+%   if(LocID == 1)
+%     pt = [180 1459; %y ,x coordinates 259, 560 filename='D:/data/husam/FDfan-left.avi';
+%      181 1459;
+%      182 1459;
+%      183 1459;
+%      184 1459;
+%      185 1459;
+%      186 1459;
+%      187 1459;
+%      188 1459;
+%      ];
+%   end
+%    if(LocID == 2)
+%     pt = [
+%      134 961; %y ,x coordinates 259, 560 filename='D:/data/husam/FDfan-left.avi';
+%      135 962;
+%      135 963;
+%      136 963;
+%      137 964;
+%      138 964;    
+%      ];
+%   end
+%   if(LocID == 3)
+%     pt = [
+%      171 344; %y ,x coordinates 259, 560 filename='D:/data/husam/FDfan-left.avi';
+%      172 344;
+%      173 344;
+%      174 344;
+%      175 343;
+%      176 343;    
+%      ];
+%   end
 %    pt = [293 630; %y ,x coordinates
 %     292 624;
 %     290 634];
@@ -51,17 +125,17 @@ filename='D:/data/forced2.mp4';
 %     218 560
 %     218 561
 %     218 562];
-pt=[492 914  %'D:/data/forced2.mp4';
-    492 915
-    492 916
-    492 917
-    492 918
-    492 919
-    492 920];
+% pt=[492 914  %'D:/data/forced2.mp4';
+%     492 915
+%     492 916
+%     492 917
+%     492 918
+%     492 919
+%     492 920];
     readFrame = @(k) imresize(rgb2y(im2single(vr.read(frameRange(1)+k-1))), scale_factor);
       
-    loCutoff = 20;
-    hiCutoff = 26;
+    loCutoff = 10;
+    hiCutoff = 14;
     sigma = 3;
     
     % Points to plot the motion in (y, x) format
@@ -126,7 +200,8 @@ pt=[492 914  %'D:/data/forced2.mp4';
                 phix(ptIdx)=angle(IDAx);
                
                 Icdy = Icf(:,n);
-%                 Icft = fft((Icdy- mean(Icdy)).*hanning(h));
+%                 Icft = fft((Icdy- mean(Icdy)));
+%                 mf2= 
 %                 [mxv,i1] = max(abs(Icft(1:h/2)));
 %                 w1=2*pi*i1/h
                 Icf2 = Icf - mean(Icdy);
@@ -161,8 +236,8 @@ pt=[492 914  %'D:/data/forced2.mp4';
       
        
         if ptIDX == 1
-            figure()
-            plot(tt,yp);
+%             figure()
+%             plot(tt,yp);
 %             xxp=yp.*hanning(nF);
 %             yf=fft(xxp);
 %             fa=(0:nF/2-1)*samplingRate/nF;
@@ -170,29 +245,47 @@ pt=[492 914  %'D:/data/forced2.mp4';
 %             plot(fa,abs(yf(1:nF/2)))
         end
     end
-yys0=(mmPerPixel/wy)*squeeze(sum(motion(:, 2, :),1))/Np;%averaged value
+wm = sqrt(wx*wx+wy*wy);    
+yys0=(mmPerPixel/wm)*squeeze(sum(motion(:, 2, :),1))/Np;%averaged value
+xxs0=(mmPerPixel/wm)*squeeze(sum(motion(:, 1, :),1))/Np;%averaged value
+% [B_band, A_band] = butter(2, [10 15]/250);
 [B_band, A_band] = butter(2, [loCutoff hiCutoff]/(samplingRate/2));
-figure()
-plot(tt,yys0);
+% figure()
+% plot(tt,yys0);
+% return
 yys0= filter(B_band, A_band, yys0, []);
-figure()
-plot(tt,yys0);
-stp=511;
+xxs0= filter(B_band, A_band, xxs0, []);
+stp=150;
 yys=yys0(stp:stp+499);
-
+xxs=xxs0(stp:stp+499);
 n=length(yys);
 tt2=(0:n-1)*1/samplingRate;
+% figure()
+% plot(tt2,xxs);
+% yf=fft(xxs.*hanning(n));
+fa=(0:n/2-1)*samplingRate/n;
+% figure()
+% plot(fa,abs(yf(1:n/2)))
+
 figure()
 plot(tt2,yys);
-xxp=yys.*hanning(n);
-yf=fft(xxp);
-fa=(0:n/2-1)*samplingRate/n;
+yf=fft(yys.*hanning(n));
 figure()
 plot(fa,abs(yf(1:n/2)))
 % [mxv,i1] = max(abs(yf(1:nF/2)))
-pathFolderResults = 'd:/data/simple/forced2ydpof.txt';
-%   writematrix(yys0,pathFolderResults,'Delimiter','tab')
-
-
+% return
+if(LocID == 1)
+  pathFolderResults = 'd:/data/cant/simple/dpofv1.txt';  
+end
+if(LocID == 2)
+  pathFolderResults = 'd:/data/cant/simple/dpofv2.txt';  
+end
+if(LocID == 3)
+  pathFolderResults = 'd:/data/cant/simple/dpofv3.txt';  
+end
+if(LocID == 4)
+  pathFolderResults = 'd:/data/cant/simple/dpofv4.txt';  
+end
+writematrix(yys0,pathFolderResults,'Delimiter','tab');  
 
 
